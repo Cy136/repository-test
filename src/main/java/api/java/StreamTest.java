@@ -1,11 +1,9 @@
 package api.java;
 
 import org.junit.Test;
+import org.springframework.util.NumberUtils;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -84,5 +82,75 @@ public class StreamTest {
         Stream<Integer> sorted1 = Stream.of("1", "3", "4", "2").map(s -> Integer.valueOf(s))
                 .sorted(Comparator.comparing(Integer::intValue).reversed());
         sorted1.forEach(System.out::println);
+    }
+
+    /**
+     * peek 中间操作，不会改变流中元素，对流中的元素进行“查看”操作，一般用于调试
+     * 只会在终端操作（如 collect）执行时真正触发，是惰性求值的
+     *
+     */
+    @Test
+    public void peekTest(){
+        List<String> list = Arrays.asList("1", "2", "3");
+        List<String> collect = list.stream()
+                .peek(p -> System.out.println("peekTest:" + p))
+                .collect(Collectors.toList());
+        // 遍历collect：集合元素未改变
+        collect.forEach(System.out::println);
+    }
+
+    /**
+     * 约简操作：从流中获取元素，终止操作
+     * 将流约简为可以在程序中使用的非流值
+     */
+
+    /**
+     * max，min 取最大值和最小值
+     *
+     */
+    @Test
+    public void maxAndMinTest(){
+        Optional<Integer> max = Stream.of(1, 2, 3).max(Comparator.comparing(Integer::intValue));
+        System.out.println("max = " + max.get());
+    }
+
+    /**
+     * findFirst:返回非空集合中第一个值
+     *
+     */
+    @Test
+    public void findFirstTest(){
+        Optional<String> first = Stream.of("a", "b", "c").findFirst();
+        System.out.println("first = " + first.get());
+    }
+
+    /**
+     * findAny:不强调第一个，而是任意一个匹配的元素都可以
+     * 在并行处理流中很有效
+     *
+     */
+    @Test
+    public void findAnyTest(){
+        Optional<Integer> any = Stream.of(1, 2, 3, 4, 5).filter(i -> i > 1).findAny();
+        System.out.println("any = " + any.get());
+    }
+
+    /**
+     * anyMatch,allMatch,noneMatch
+     *
+     */
+    @Test
+    public void anyMatchTest(){
+        // anyMatch:任意一元素匹配返回true
+        boolean anyMatch = Stream.of(1, 2, 3, 4, 5).anyMatch(i -> i == 2);
+        System.out.println("anyMatch = " + anyMatch);
+
+        // allMatch：所有元素都匹配返回true
+        boolean allMatch = Stream.of(1, 2, 3, 4, 5).allMatch(i -> i < 6);
+        System.out.println("allMatch = " + allMatch);
+
+        // noneMatch：所有元素都不匹配返回true
+        boolean noneMatch = Stream.of(1, 2, 3, 4, 5).noneMatch(i -> i == 0);
+        System.out.println("noneMatch = " + noneMatch);
     }
 }
